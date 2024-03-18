@@ -134,6 +134,11 @@ public:
             defaultMessageHandler.detach();
     }
 
+    template<class T>
+    void setDefaultMessageHandler(T *item, void(T::*method)(MessageData&)) {
+    	defaultMessageHandler.attach(item, method);
+    }
+
     /** Set a message handling callback.  This can be used outside of the the subscribe method.
      *  @param topicFilter - a topic pattern which can include wildcards
      *  @param mh - pointer to the callback function. If 0, removes the callback if any
