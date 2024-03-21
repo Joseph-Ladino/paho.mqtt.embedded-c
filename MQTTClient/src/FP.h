@@ -140,6 +140,15 @@ public:
         c_callback = 0;
     }
 
+    FP(retT (*function)(argT)) : FP() {
+    	attach(function);
+    }
+
+    template<class T>
+    FP(T *item, retT (T::*method)(argT)) : FP() {
+    	attach(item, method);
+    }
+
     /** Add a callback function to the object
      *  @param item - Address of the initialized object
      *  @param member - Address of the member function (dont forget the scope that the function is defined in)
@@ -160,6 +169,14 @@ public:
         c_callback = function;
     }
 
+    void attach(const FP<retT, argT>& rhs) {
+    	if(rhs.obj_callback) {
+    		obj_callback = rhs.obj_callback;
+    		method_callback = rhs.method_callback;
+    	} else {
+    		c_callback = rhs.c_callback;
+    	}
+    }
     /** Invoke the function attached to the class
      *  @param arg - An argument that is passed into the function handler that is called
      *  @return The return from the function hanlder called by this class
@@ -171,6 +188,14 @@ public:
         }
         return (retT)0;
     }
+
+//    bool operator==(const int rhs) const {
+//    	return c_callback == rhs || method_callback == rhs;
+//    }
+//
+//    bool operator!=(const int rhs) const {
+//    	return !this->operator ==(rhs);
+//    }
 
     /** Determine if an callback is currently hooked
      *  @return 1 if a method is hooked, 0 otherwise

@@ -114,7 +114,9 @@ class Client
 
 public:
 
-    typedef void (*messageHandler)(MessageData&);
+//    typedef void (*messageHandler)(MessageData&);
+
+	typedef FP<void, MessageData&> messageHandler;
 
     /** Construct the client
      *  @param network - pointer to an instance of the Network class - must be connected to the endpoint
@@ -128,7 +130,7 @@ public:
      */
     void setDefaultMessageHandler(messageHandler mh)
     {
-        if (mh != 0)
+        if (mh.attached())
             defaultMessageHandler.attach(mh);
         else
             defaultMessageHandler.detach();
@@ -822,7 +824,7 @@ int MQTT::Client<Network, Timer, MAX_MQTT_PACKET_SIZE, MAX_MESSAGE_HANDLERS>::se
     {
         if (messageHandlers[i].topicFilter != 0 && strcmp(messageHandlers[i].topicFilter, topicFilter) == 0)
         {
-            if (messageHandler == 0) // remove existing
+            if (!messageHandler.attached()) // remove existing
             {
                 messageHandlers[i].topicFilter = 0;
                 messageHandlers[i].fp.detach();
@@ -832,7 +834,7 @@ int MQTT::Client<Network, Timer, MAX_MQTT_PACKET_SIZE, MAX_MESSAGE_HANDLERS>::se
         }
     }
     // if no existing, look for empty slot (unless we are removing)
-    if (messageHandler != 0) {
+    if (messageHandler.attached()) {
         if (rc == FAILURE)
         {
             for (i = 0; i < MAX_MESSAGE_HANDLERS; ++i)
